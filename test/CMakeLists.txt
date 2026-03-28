@@ -1,0 +1,1 @@
+pnrt_add_test(arma_test SRCS arma_test.cc DEPS ${ARMADILLO_LIBRARIES})

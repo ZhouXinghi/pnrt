@@ -1,0 +1,30 @@
+load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
+
+cc_library(
+    name = "pnrt",
+    srcs = [
+        "ir.cc",
+        "store-zip.cc",
+    ],
+    hdrs = glob(["*.h"]),  # 在sandbox里生命这些头文件存在
+    implementation_deps = [
+        "@glog",
+    ],
+    includes = ["."],  # 指定构建这个库依赖的头文件路径
+    visibility = ["//visibility:public"],
+    deps = ["//include:pnrt-public-headers"],
+)
+
+cc_test(
+    name = "ir-test",
+    srcs = ["ir-test.cc"],
+    data = [
+        "//data:test_linear.pnnx.bin",
+        "//data:test_linear.pnnx.param",
+    ],
+    deps = [
+        ":pnrt",
+        "@glog",
+        "@googletest//:gtest_main",
+    ],
+)

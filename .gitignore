@@ -1,0 +1,8 @@
+.cache
+.vscode
+# bazel-bin
+# bazel-out
+# bazel-testlogs
+# bazel-pnrt
+compile_commands.json
+MODULE.bazel.lock

@@ -1,0 +1,6 @@
+build --cxxopt=-std=c++17
+build --host_cxxopt=-std=c++17
+
+# Bazel 9 removed built-in cc_* and py_* rules. This flag auto-loads them for
+# external deps (like googletest, hedron_compile_commands) that haven't migrated yet.
+build --incompatible_autoload_externally=+@rules_cc,+@rules_python
