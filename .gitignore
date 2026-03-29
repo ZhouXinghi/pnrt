@@ -6,3 +6,4 @@
 # bazel-pnrt
 compile_commands.json
 MODULE.bazel.lock
+.DS_Store

@@ -58,7 +58,7 @@ struct Attribute {
 struct Weight {
   std::vector<int> shape;
   DataType data_type;
-  std::vector<float> data;
+  std::vector<char> data;
 };
 
 struct Operator;
@@ -71,6 +71,9 @@ struct Operand {
 };
 
 struct Operator {
+  size_t InDegree() const noexcept { return predecessors.size(); }
+  size_t OutDegree() const noexcept { return successors.size(); }
+
   std::string type;
   std::string name;
   std::unordered_map<std::string, std::string>
@@ -79,18 +82,25 @@ struct Operator {
   std::unordered_map<std::string, Operand*> outputs;
   std::unordered_map<std::string, Attribute> attributes;
   std::unordered_map<std::string, Weight> weights;
+
+  std::vector<Operator*> predecessors;
+  std::vector<Operator*> successors;
 };
 
 struct Graph {
   void clear() {
     ops.clear();
     operands.clear();
+    ops_topo_order.clear();
   }
   bool Load(const std::string& param_path, const std::string& bin_path);
   void Save(const std::string& param_path, const std::string& bin_path) const;
+  bool TopoSort();
 
   std::unordered_map<std::string, std::unique_ptr<Operator>> ops;
   std::unordered_map<std::string, std::unique_ptr<Operand>> operands;
+
+  std::vector<Operator*> ops_topo_order;
 };
 
 }  // namespace pnrt

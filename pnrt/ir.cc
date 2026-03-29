@@ -73,6 +73,8 @@ bool Graph::Load(const std::string& param_path, const std::string& bin_path) {
       // As an input operand, it must already exsist.
       Operand* operand = operands.at(operand_name).get();
       operand->consumers.push_back(op.get());
+      operand->producer->successors.push_back(op.get());
+      op->predecessors.push_back(operand->producer);
       op->inputs.insert({operand_name, operand});
     }
     for (auto j = 0; j < output_count; ++j) {
@@ -138,6 +140,49 @@ bool Graph::Load(const std::string& param_path, const std::string& bin_path) {
     }
     ops.insert({op->name, std::move(op)});
   }
+  return true;
+}
+
+bool Graph::TopoSort() {
+  ops_topo_order.clear();
+  ops_topo_order.reserve(ops.size());
+
+  // Compute in-degrees for each operator.
+  std::unordered_map<Operator*, size_t> in_degree;
+  in_degree.reserve(ops.size());
+  for (const auto& [name, op] : ops) {
+    in_degree[op.get()] = op->InDegree();
+  }
+
+  // Initialize queue with operators that have no predecessors.
+  std::queue<Operator*> queue;
+  for (const auto& [name, op] : ops) {
+    if (in_degree[op.get()] == 0) {
+      queue.push(op.get());
+    }
+  }
+
+  while (!queue.empty()) {
+    Operator* op = queue.front();
+    queue.pop();
+    ops_topo_order.push_back(op);
+
+    for (Operator* successor : op->successors) {
+      assert(in_degree[successor] > 0);
+      if (--in_degree[successor] == 0) {
+        queue.push(successor);
+      }
+    }
+  }
+
+  if (ops_topo_order.size() != ops.size()) {
+    LOG(ERROR) << "TopoSort failed: graph has a cycle. Sorted "
+               << ops_topo_order.size() << " out of " << ops.size()
+               << " operators.";
+    ops_topo_order.clear();
+    return false;
+  }
+
   return true;
 }
 
