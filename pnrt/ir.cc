@@ -88,11 +88,9 @@ bool Graph::Load(const std::string& param_path, const std::string& bin_path) {
       operands.insert({operand_name, std::move(operand)});
     }
 
-    while (!iss.eof()) {
-      // still have attributes or weights
-      std::string attr_or_weight;
-      iss >> attr_or_weight;
-
+    // still have attributes or weights
+    std::string attr_or_weight;
+    while (iss >> attr_or_weight) {
       std::string key;
       std::string value;
       std::istringstream attr_or_weight_iss(attr_or_weight);
@@ -103,18 +101,18 @@ bool Graph::Load(const std::string& param_path, const std::string& bin_path) {
           Weight weight;
           auto [shape, data_type] = ParseShapeAndTypeFromString(value);
 
-          size_t size = 1;
+          size_t num_elements = 1;
           for (int i : shape) {
-            size *= i;
+            num_elements *= i;
           }
-          size *= SizeOfDataType(data_type);
+          size_t byte_size = num_elements * SizeOfDataType(data_type);
 
           std::string weight_name = op->name + "." + key.substr(1);
-          assert(szr.get_file_size(weight_name) == size);
+          assert(szr.get_file_size(weight_name) == byte_size);
 
           weight.shape = std::move(shape);
           weight.data_type = data_type;
-          weight.data.resize(size);
+          weight.data.resize(byte_size);
           szr.read_file(weight_name, (char*)weight.data.data());
           op->weights.insert({key.substr(1), weight});
           break;
@@ -176,7 +174,7 @@ bool Graph::TopoSort() {
   }
 
   if (ops_topo_order.size() != ops.size()) {
-    LOG(ERROR) << "TopoSort failed: graph has a cycle. Sorted "
+    LOG(FATAL) << "TopoSort failed: graph has a cycle. Sorted "
                << ops_topo_order.size() << " out of " << ops.size()
                << " operators.";
     ops_topo_order.clear();

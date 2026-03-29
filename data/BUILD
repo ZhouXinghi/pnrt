@@ -1,4 +1,5 @@
-exports_files([
-    "test_linear.pnnx.param",
-    "test_linear.pnnx.bin",
-])
+filegroup(
+    name = "all_data",
+    srcs = glob(["*"]),
+    visibility = ["//visibility:public"],
+)

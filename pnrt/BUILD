@@ -19,8 +19,7 @@ cc_test(
     name = "ir-test",
     srcs = ["ir-test.cc"],
     data = [
-        "//data:test_linear.pnnx.bin",
-        "//data:test_linear.pnnx.param",
+        "//data:all_data",
     ],
     deps = [
         ":pnrt",

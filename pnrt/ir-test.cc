@@ -8,15 +8,21 @@ namespace pnrt {
 namespace test {
 
 class GraphTest : public ::testing::Test {
+ protected:
+  static void SetUpTestSuite() {}
+
   void SetUp() override {
     const char* param_path = std::getenv("PARAM_PATH");
     const char* bin_path = std::getenv("BIN_PATH");
+    ASSERT_TRUE(param_path != nullptr)
+        << "PARAM_PATH environment variable is not set";
+    ASSERT_TRUE(bin_path != nullptr)
+        << "BIN_PATH environment variable is not set";
     ASSERT_TRUE(graph_.Load(param_path, bin_path));
   }
 
   void TearDown() override {}
 
- protected:
   Graph graph_;
 };
 
@@ -26,38 +32,40 @@ TEST_F(GraphTest, Load) {
   for (const auto& [op_name, op] : ops) {
     LOG(INFO) << "op name: " << op_name;
     LOG(INFO) << "op type: " << op->type;
+    for (const auto& [internal_input_name, input_name] :
+         op->internal_input_name_to_operand_input_name) {
+      LOG(INFO) << "internal input name: " << internal_input_name << " --> "
+                << "operand input name: " << input_name;
+    }
     LOG(INFO) << "op predecessors: ";
     for (Operator* predecessor : op->predecessors) {
-      LOG(INFO) << predecessor->name << " ";
+      LOG(INFO) << "\t" << predecessor->name << " ";
     }
     LOG(INFO) << "op successors: ";
     for (Operator* successor : op->successors) {
-      LOG(INFO) << successor->name << " ";
+      LOG(INFO) << "\t" << successor->name << " ";
     }
+
+    LOG(INFO) << "op inputs: ";
     for (const auto& [input_name, operand] : op->inputs) {
-      LOG(INFO) << "input name: " << input_name;
-      LOG(INFO) << "input operand name: " << operand->name;
-      LOG(INFO) << "input operand shape: " << ShapeToString(operand->shape);
-      LOG(INFO) << "\n";
-      LOG(INFO) << "input operand data type: "
-                << DataTypeToString(operand->data_type);
+      LOG(INFO) << "\t" << input_name << " " << ShapeToString(operand->shape)
+                << " " << DataTypeToString(operand->data_type);
     }
+    LOG(INFO) << "op outputs: ";
     for (const auto& [output_name, operand] : op->outputs) {
-      LOG(INFO) << "output name: " << output_name;
-      LOG(INFO) << "output operand name: " << operand->name;
-      LOG(INFO) << "output operand shape: " << ShapeToString(operand->shape);
-      LOG(INFO) << "\n";
-      LOG(INFO) << "output operand data type: "
-                << DataTypeToString(operand->data_type);
+      LOG(INFO) << "\t" << output_name << " " << ShapeToString(operand->shape)
+                << " " << DataTypeToString(operand->data_type);
     }
+
+    LOG(INFO) << "op attributes: ";
     for (const auto& [attr_name, attr] : op->attributes) {
-      LOG(INFO) << "attribute name: " << attr_name;
-      LOG(INFO) << "attribute value: " << attr.value;
+      LOG(INFO) << "\t" << attr_name << " = " << attr.value;
     }
+
+    LOG(INFO) << "op weights: ";
     for (const auto& [weight_name, weight] : op->weights) {
-      LOG(INFO) << "weight name: " << weight_name;
-      LOG(INFO) << "weight shape: " << ShapeToString(weight.shape);
-      LOG(INFO) << "weight data type: " << DataTypeToString(weight.data_type);
+      LOG(INFO) << "\t" << weight_name << ": " << ShapeToString(weight.shape)
+                << " " << DataTypeToString(weight.data_type);
     }
     LOG(INFO) << "-----------------------------------";
   }
