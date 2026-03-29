@@ -1,8 +1,6 @@
 #ifndef PNRT_TENSOR_H
 #define PNRT_TENSOR_H
 
-#include <glog/logging.h>
-
 #include <armadillo>
 #include <cstdint>
 #include <vector>
@@ -27,9 +25,7 @@ class Tensor<float> {
   float at(uint32_t c, uint32_t h, uint32_t w) const { return cube_(h, w, c); }
 
   void Fill(float value) { cube_.fill(value); }
-  void Fill(const std::vector<float>& values, bool row_major = true) {
-    CHECK(values.size() == size());
-  }
+  void Fill(const std::vector<float>& values, bool row_major = true);
   void Reshape(uint32_t c, uint32_t h, uint32_t w) { cube_.reshape(h, w, c); }
 
  private:

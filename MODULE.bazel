@@ -19,14 +19,18 @@ git_override(
     # Even better, set up Renovate and let it do the work for you (see "Suggestion: Updates" in the README).
 )
 
-# Use locally installed Armadillo (via Homebrew)
-new_local_repository = use_repo_rule(
-    "@bazel_tools//tools/build_defs/repo:local.bzl",
-    "new_local_repository",
+# Armadillo (source, header-only mode)
+http_archive = use_repo_rule(
+    "@bazel_tools//tools/build_defs/repo:http.bzl",
+    "http_archive",
 )
 
-new_local_repository(
+http_archive(
     name = "armadillo",
     build_file = "//third_party:armadillo.BUILD",
-    path = "/opt/homebrew/opt/armadillo",
+    sha256 = "bb03a16da6b2cca43962b65a2890faf4e6b16607220cf60270436a11e09e6f46",
+    strip_prefix = "armadillo-15.2.4",
+    url = "https://sourceforge.net/projects/arma/files/armadillo-15.2.4.tar.xz",
 )
+
+
