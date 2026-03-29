@@ -1,8 +1,6 @@
 #ifndef PNRT_IR_H
 #define PNRT_IR_H
 
-#include <glog/logging.h>
-
 #include <cassert>
 #include <string>
 #include <unordered_map>
@@ -21,9 +19,8 @@ inline size_t SizeOfDataType(DataType data_type) {
   switch (data_type) {
     case DataType::kFloat32:
       return 4;
-    default: {
-      LOG(FATAL) << "unsupported data type";
-    }
+    default:
+      return 0;  // should never reach here
   }
 }
 

@@ -1,5 +1,5 @@
-#include <glog/logging.h>
 #include <ir.h>
+#include <logging.h>
 #include <store-zip.h>
 
 #include <cassert>
@@ -32,7 +32,7 @@ bool Graph::Load(const std::string& param_path, const std::string& bin_path) {
 
   std::ifstream param_file(param_path);
   if (!param_file.good()) {
-    LOG(ERROR) << "open param file failed: " << param_path;
+    PNRT_ERROR << "open param file failed: " << param_path;
     return false;
   }
 
