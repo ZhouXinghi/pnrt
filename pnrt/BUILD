@@ -3,6 +3,7 @@ load("@rules_cc//cc:defs.bzl", "cc_library", "cc_test")
 cc_library(
     name = "pnrt",
     srcs = [
+        "Tensor.cc",
         "ir.cc",
         "store-zip.cc",
     ],
@@ -21,6 +22,16 @@ cc_test(
     data = [
         "//data:all_data",
     ],
+    deps = [
+        ":pnrt",
+        "@glog",
+        "@googletest//:gtest_main",
+    ],
+)
+
+cc_test(
+    name = "tensor-test",
+    srcs = ["tensor-test.cc"],
     deps = [
         ":pnrt",
         "@glog",
