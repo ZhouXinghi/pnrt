@@ -50,7 +50,19 @@ TEST(TensorTest, Create3DTensor) {
   PrintTensor(tensor);
 }
 
-TEST(TensorTest, ReshapeTensor) {
+TEST(TensorTest, Fill) {
+  Tensor<float> tensor(2, 3, 4);
+  std::vector<float> values(tensor.size());
+  for (size_t i = 0; i < values.size(); ++i) {
+    values[i] = static_cast<float>(i);
+  }
+  tensor.Fill(values, true);
+  PrintTensor(tensor);
+  tensor.Fill(values, false);
+  PrintTensor(tensor);
+}
+
+TEST(TensorTest, Reshape) {
   Tensor<float> tensor(2, 3, 4);
   std::vector<float> values(tensor.size());
   for (size_t i = 0; i < values.size(); ++i) {

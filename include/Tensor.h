@@ -25,7 +25,8 @@ class Tensor<float> {
   float at(uint32_t c, uint32_t h, uint32_t w) const { return cube_(h, w, c); }
 
   void Fill(float value) { cube_.fill(value); }
-  void Fill(const std::vector<float>& values, bool row_major = true);
+  void Fill(const std::vector<float>& values,
+            bool values_in_row_major_style = true);
   void Reshape(uint32_t c, uint32_t h, uint32_t w) { cube_.reshape(h, w, c); }
 
  private:
