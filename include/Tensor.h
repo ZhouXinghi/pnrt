@@ -24,10 +24,11 @@ class Tensor<float> {
   float& at(uint32_t c, uint32_t h, uint32_t w) { return cube_(h, w, c); }
   float at(uint32_t c, uint32_t h, uint32_t w) const { return cube_(h, w, c); }
 
+  std::vector<float> Values(bool row_majow = false) const;
+
   void Fill(float value) { cube_.fill(value); }
-  void Fill(const std::vector<float>& values,
-            bool values_in_row_major_style = true);
-  void Reshape(uint32_t c, uint32_t h, uint32_t w) { cube_.reshape(h, w, c); }
+  void Fill(const std::vector<float>& values, bool row_major = false);
+  void Reshape(uint32_t c, uint32_t h, uint32_t w, bool row_major = false);
 
  private:
   arma::fcube cube_;

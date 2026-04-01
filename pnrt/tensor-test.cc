@@ -7,17 +7,14 @@ namespace test {
 
 void PrintTensor(const Tensor<float>& tensor) {
   LOG(INFO) << '\n' << tensor.data();
-  // for (uint32_t c = 0; c < tensor.c(); ++c) {
-  //   LOG(INFO) << "Channel " << c << ":";
-  //   LOG(INFO) << tensor.data().slice(c);
-  //   // for (uint32_t h = 0; h < tensor.h(); ++h) {
-  //   //   std::string row_str;
-  //   //   for (uint32_t w = 0; w < tensor.w(); ++w) {
-  //   //     row_str += std::to_string(tensor.at(c, h, w)) + " ";
-  //   //   }
-  //   //   LOG(INFO) << row_str;
-  //   // }
-  // }
+}
+
+void PrintVector(const std::vector<float>& values) {
+  std::string str;
+  for (float value : values) {
+    str += std::to_string(value) + " ";
+  }
+  LOG(INFO) << str;
 }
 
 TEST(TensorTest, Create1DTensor) {
@@ -50,15 +47,32 @@ TEST(TensorTest, Create3DTensor) {
   PrintTensor(tensor);
 }
 
+TEST(TensorTest, Values) {
+  Tensor<float> tensor(2, 3, 4);
+  std::vector<float> values(tensor.size());
+  for (size_t i = 0; i < values.size(); ++i) {
+    values[i] = static_cast<float>(i);
+  }
+  tensor.Fill(values);
+  PrintTensor(tensor);
+  PrintVector(tensor.Values());
+
+  EXPECT_TRUE(tensor.Values() == values);
+  tensor.Fill(values, true);
+  PrintTensor(tensor);
+  PrintVector(tensor.Values(true));
+  EXPECT_TRUE(tensor.Values(true) == values);
+}
+
 TEST(TensorTest, Fill) {
   Tensor<float> tensor(2, 3, 4);
   std::vector<float> values(tensor.size());
   for (size_t i = 0; i < values.size(); ++i) {
     values[i] = static_cast<float>(i);
   }
-  tensor.Fill(values, true);
+  tensor.Fill(values);
   PrintTensor(tensor);
-  tensor.Fill(values, false);
+  tensor.Fill(values, true);
   PrintTensor(tensor);
 }
 
@@ -69,11 +83,14 @@ TEST(TensorTest, Reshape) {
     values[i] = static_cast<float>(i);
   }
   tensor.Fill(values);
+  LOG(INFO) << "Before reshape:";
+  PrintTensor(tensor);
   tensor.Reshape(4, 3, 2);
   EXPECT_EQ(tensor.c(), 4);
   EXPECT_EQ(tensor.h(), 3);
   EXPECT_EQ(tensor.w(), 2);
   EXPECT_EQ(tensor.size(), 24);
+  LOG(INFO) << "After reshape:";
   PrintTensor(tensor);
 }
 
