@@ -112,5 +112,41 @@ TEST(TensorTest, ReshapeRowMajor) {
   PrintTensor(tensor);
 }
 
+TEST(TensorTest, FlattenColMajor) {
+  Tensor<float> tensor(2, 3, 4);
+  std::vector<float> values(tensor.size());
+  for (size_t i = 0; i < values.size(); ++i) {
+    values[i] = static_cast<float>(i);
+  }
+  tensor.Fill(values);
+  LOG(INFO) << "Before flatten:";
+  PrintTensor(tensor);
+  tensor.Flatten();
+  EXPECT_EQ(tensor.c(), 1);
+  EXPECT_EQ(tensor.h(), 1);
+  EXPECT_EQ(tensor.w(), 24);
+  EXPECT_EQ(tensor.size(), 24);
+  LOG(INFO) << "After flatten as col major:";
+  PrintTensor(tensor);
+}
+
+TEST(TensorTest, FlattenRowMajor) {
+  Tensor<float> tensor(2, 3, 4);
+  std::vector<float> values(tensor.size());
+  for (size_t i = 0; i < values.size(); ++i) {
+    values[i] = static_cast<float>(i);
+  }
+  tensor.Fill(values, true);
+  LOG(INFO) << "Before flatten:";
+  PrintTensor(tensor);
+  tensor.Flatten(true);
+  EXPECT_EQ(tensor.c(), 1);
+  EXPECT_EQ(tensor.h(), 1);
+  EXPECT_EQ(tensor.w(), 24);
+  EXPECT_EQ(tensor.size(), 24);
+  LOG(INFO) << "After flatten as row major:";
+  PrintTensor(tensor);
+}
+
 }  // namespace test
 }  // namespace pnrt
