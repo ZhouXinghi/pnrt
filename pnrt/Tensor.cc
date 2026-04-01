@@ -51,5 +51,8 @@ void Tensor<float>::Reshape(uint32_t c, uint32_t h, uint32_t w,
     cube_.reshape(h, w, c);
     return;
   }
+  std::vector<float> values = Values(true);
+  cube_.set_size(h, w, c);
+  Fill(values, true);
 }
 }  // namespace pnrt

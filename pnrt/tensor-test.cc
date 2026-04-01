@@ -76,7 +76,7 @@ TEST(TensorTest, Fill) {
   PrintTensor(tensor);
 }
 
-TEST(TensorTest, Reshape) {
+TEST(TensorTest, ReshapeColMajor) {
   Tensor<float> tensor(2, 3, 4);
   std::vector<float> values(tensor.size());
   for (size_t i = 0; i < values.size(); ++i) {
@@ -86,6 +86,24 @@ TEST(TensorTest, Reshape) {
   LOG(INFO) << "Before reshape:";
   PrintTensor(tensor);
   tensor.Reshape(4, 3, 2);
+  EXPECT_EQ(tensor.c(), 4);
+  EXPECT_EQ(tensor.h(), 3);
+  EXPECT_EQ(tensor.w(), 2);
+  EXPECT_EQ(tensor.size(), 24);
+  LOG(INFO) << "After reshape:";
+  PrintTensor(tensor);
+}
+
+TEST(TensorTest, ReshapeRowMajor) {
+  Tensor<float> tensor(2, 3, 4);
+  std::vector<float> values(tensor.size());
+  for (size_t i = 0; i < values.size(); ++i) {
+    values[i] = static_cast<float>(i);
+  }
+  tensor.Fill(values, true);
+  LOG(INFO) << "Before reshape:";
+  PrintTensor(tensor);
+  tensor.Reshape(4, 3, 2, true);
   EXPECT_EQ(tensor.c(), 4);
   EXPECT_EQ(tensor.h(), 3);
   EXPECT_EQ(tensor.w(), 2);
