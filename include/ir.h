@@ -1,6 +1,8 @@
 #ifndef PNRT_IR_H
 #define PNRT_IR_H
 
+#include <Tensor.h>
+
 #include <cassert>
 #include <string>
 #include <unordered_map>
@@ -63,6 +65,7 @@ struct Operand {
   std::string name;
   std::vector<int> shape;
   DataType data_type;
+  std::vector<Tensor<float>> tensors;
   Operator* producer;
   std::vector<Operator*> consumers;
 };
@@ -76,7 +79,9 @@ struct Operator {
   std::unordered_map<std::string, std::string>
       internal_input_name_to_operand_input_name;
   std::unordered_map<std::string, Operand*> inputs;
-  std::unordered_map<std::string, Operand*> outputs;
+  std::unordered_map<std::string, Operand*>
+      outputs;  //!< Now we only support zero or one output, that is outputs
+                //!< outputs.sizer() <= 1
   std::unordered_map<std::string, Attribute> attributes;
   std::unordered_map<std::string, Weight> weights;
 
@@ -93,6 +98,7 @@ struct Graph {
   bool Load(const std::string& param_path, const std::string& bin_path);
   void Save(const std::string& param_path, const std::string& bin_path) const;
   bool TopoSort();
+  void InitOperandSpace();
 
   std::unordered_map<std::string, std::unique_ptr<Operator>> ops;
   std::unordered_map<std::string, std::unique_ptr<Operand>> operands;

@@ -8,6 +8,42 @@
 
 namespace pnrt {
 
+namespace {
+void InitOpOutputSpace(const Operator& op) {
+  const auto& operands = op.outputs;
+  // We only support at most one output operand for each operator.
+  PNRT_CHECK(operands.size() <= 1);
+  if (operands.empty()) {
+    // This operator has no output operand, so we don't need to initialize any
+    // output space.
+    return;
+  }
+  PNRT_CHECK(operands.size() == 1);
+  const auto& [_, operand] = *operands.begin();
+  if (!operand->tensors.empty()) {
+    // The output space has already been initialized, so we don't need to do it
+    // again.
+    return;
+  }
+  const auto dims = operand->shape.size();
+  CHECK(dims >= 2 && dims <= 4);
+  const auto batch = operand->shape.at(0);
+  CHECK(batch >= 1);
+  CHECK(operand->data_type == DataType::kFloat32);
+  for (auto i = 0; i < batch; ++i) {
+    if (dims == 4) {
+      operand->tensors.emplace_back(operand->shape[1], operand->shape[2],
+                                    operand->shape[3]);
+    } else if (dims == 3) {
+      operand->tensors.emplace_back(1, operand->shape[1], operand->shape[2]);
+    } else if (dims == 2) {
+      operand->tensors.emplace_back(1, 1, operand->shape[1]);
+    }
+  }
+}
+
+}  // namespace
+
 std::pair<std::vector<int>, DataType> ParseShapeAndTypeFromString(
     const std::string& value) {
   // shape
@@ -182,6 +218,15 @@ bool Graph::TopoSort() {
   }
 
   return true;
+}
+
+void Graph::InitOperandSpace() {
+  for (const auto& [_, op] : ops) {
+    // We only need to initialize the output space for each operator, because
+    // the input space should have already been initialized by its producer
+    // operator.
+    InitOpOutputSpace(*op);
+  }
 }
 
 }  // namespace pnrt

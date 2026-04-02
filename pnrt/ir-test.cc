@@ -80,6 +80,12 @@ TEST_F(GraphTest, TopoSort) {
   }
 }
 
-}  // namespace test
+TEST_F(GraphTest, InitOperandSpace) {
+  graph_.InitOperandSpace();
+  for (const auto& [name, operand] : graph_.operands) {
+    EXPECT_TRUE(!operand->tensors.empty());
+  }
+}
 
+}  // namespace test
 }  // namespace pnrt

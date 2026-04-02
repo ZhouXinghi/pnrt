@@ -13,8 +13,10 @@ class Tensor {};
 template <>
 class Tensor<float> {
  public:
+  explicit Tensor() = default;
   explicit Tensor(uint32_t c, uint32_t h, uint32_t w) : cube_(h, w, c) {}
 
+  bool empty() const { return cube_.empty(); };
   uint32_t c() const { return cube_.n_slices; }
   uint32_t h() const { return cube_.n_rows; }
   uint32_t w() const { return cube_.n_cols; }
